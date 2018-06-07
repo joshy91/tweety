@@ -11,4 +11,10 @@ FactoryBot.define do
   	message "Good Evening"
   	user_id 1
   end
+  
+  factory :invalid_tweet, class: Tweet do
+    association :user
+    message nil
+    user_id nil
+  end
 end

@@ -61,4 +61,64 @@ RSpec.describe TweetsController, type: :controller do
     end
   end
 
+  describe "POST #create" do
+    let(:user) { create(:user) }
+    let(:valid_attributes) { attributes_for(:goodmorning) }
+    let(:invalid_attributes) { attributes_for(:invalid_tweet) }
+    context "with valid attributes" do
+      it 'persists new tweet' do
+        expect {
+          post :create, params: { tweet: valid_attributes }
+        }.to change(Tweet, :count).by(1)
+      end
+      it 'redirects to show page' do
+        post :create, params: { tweet: valid_attributes }
+        expect(response).to redirect_to(assigns(:tweet))
+      end
+    end
+    context 'with invalid attributes' do
+      it 'does not persist tweet' do
+        expect{
+          post :create, params: {tweet: invalid_attributes}
+        }.not_to change(Tweet, :count)
+      end
+      it 're-renders :new template' do
+        post :create, params: { tweet: invalid_attributes }
+        expect(response).to render_template(:new)
+      end
+    end
+  end
+
+describe '#PATCH #update' do
+  let(:tweet) { create(:goodmorning)}
+  let(:new_attributes) { attributes_for(:goodevening) }
+  let(:invalid_attributes) { attributes_for(:invalid_tweet) }
+
+  context 'with valid params' do
+  	it 'updates the selected tweet' do
+  		patch :update, params: { id: tweet.to_param, tweet: new_attributes }
+  		tweet.reload
+  		expect(tweet.message).to eql('Good Evening')
+  		expect(tweet.user_id).to eql(1)
+	end
+
+	it 'redirects to the tweet' do 
+		patch :update, params: { id: tweet.to_param, tweet: new_attributes }
+		tweet.reload
+		expect(response).to redirect_to(tweet)
+	end
 end
+	context 'with invalid params' do
+		it 'does not update the tweet' do 
+			patch :update, params: {id: tweet.to_param, tweet: invalid_attributes}
+			expect(assigns(:tweet)).to eq(tweet)
+		end
+
+		it 're-renders the edit template' do
+			patch :update, params: {id: tweet.to_param, tweet: invalid_attributes}
+			expect(response).to render_template(:edit)
+		end
+	end
+end
+end
+
